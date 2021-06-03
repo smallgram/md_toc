@@ -14,3 +14,4 @@ bin           = @["md_toc"]
 requires "nim >= 1.4.6"
 requires "npeg#5d80f93"
 requires "cligen#0903dec"
+requires "regex#eeefb4f"
