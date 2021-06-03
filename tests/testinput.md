@@ -3,7 +3,7 @@ This is some regular text.
 
 Here is some more regular text.
 
-## Here is sub-header 1
+## Here is sub-header 1  ##  
 Here is some underlying text.
 
 ### Here is sub-sub-header 1
