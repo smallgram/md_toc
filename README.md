@@ -5,10 +5,10 @@ contents into Markdown files.
 # Table of Contents
 * [md_toc](#md_toc)
 	* [How to use](#how-to-use)
-		* [At a glance:](#at-a-glance:)
-		* [Other options:](#other-options:)
+		* [At a glance:](#at-a-glance)
+		* [Other options:](#other-options)
 	* [How to install](#how-to-install)
-	* [Why?](#why?)
+	* [Why?](#why)
 
 
 ## How to use
