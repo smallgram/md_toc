@@ -24,14 +24,7 @@ This is a basic command line tool `md_toc`. The only required parameter is
 `inputPath`, which is the path to a Markdown file to process.
 
 By default, the tool will process the `inputPath` Markdown file and insert
-the generated linked TOC at a `# Table of Contents
-* [md_toc](#md_toc)
-	* [How to use](#how-to-use)
-		* [At a glance:](#at-a-glance:)
-		* [Other options:](#other-options:)
-	* [How to install](#how-to-install)
-	* [Why?](#why?)
-` marker located in the file.
+the generated linked TOC at a `<<TOC>>` marker located in the file.
 The TOC is based purely off of headers located in the input file.
 
 ### Other options:
@@ -40,14 +33,7 @@ file touched.
 * `inject` is an option that can be set to `false` or `0` to prevent the
 injection of the TOC into the Markdown. Instead, it will just output to stdout.
 * `top` is an option that can be set to `true` or `1` to inject the generated
-TOC at the top of the `outputPath` instead of looking for a `# Table of Contents
-* [md_toc](#md_toc)
-	* [How to use](#how-to-use)
-		* [At a glance:](#at-a-glance:)
-		* [Other options:](#other-options:)
-	* [How to install](#how-to-install)
-	* [Why?](#why?)
-` marker.
+TOC at the top of the `outputPath` instead of looking for a `<<TOC>>` marker.
 
 You can always use the `--help` switch for a reminder of the available options.
 
