@@ -1,13 +1,44 @@
 import os
+import strutils
+import strformat
 
 import cligen
 import regex 
 
 
+type
+  Header = object
+    text: string
+    level: int
 
-proc generateTOC(inputPath: string,
+
+proc extractHeaders(markdown: string): seq[Header] =
+  ## Extract the header heirarchy from a passed in chunk of `markdown`
+  let headerPattern = re"^ *(#{1,6}) *(.*?) *#* *$"
+  var m: RegexMatch
+  #var headers: seq[Header] = @[]
+  
+  # first a line-by-line method
+  for l in markdown.splitLines():
+    if l.match(headerPattern, m):
+      let lev = m.group(0, l)[0]
+      let tex = m.group(1, l)[0] 
+      result.add(Header(text: tex, level: lev.len))
+
+
+proc generateTOC(headers: seq[Header]): string =
+  ## Generate a markdown chunk representing the passed in `headers`
+  result.add("# Table of Contents\p")
+  for head in headers:
+    result.add(&"{\"\t\".repeat(head.level - 1)}* [{head.text}]" & 
+               &"(#{head.text.toLowerAscii.replace(' ','-')})\p")
+
+
+proc createTOC(inputPath: string,
                  outputPath: string = "",
-                 print: bool = false): bool =
+                 inject: bool = true,
+                 top: bool = false): bool =
+  ## Create a TOC for an input markdown file. This is the program entry.
   var outPath: string = if outputPath == "": inputPath else: outputPath
   var (outDir, outFile, outExt) = outPath.splitFile()
 
@@ -18,34 +49,50 @@ proc generateTOC(inputPath: string,
   else:
     echo "OUTPUT FOLDER EXISTS."
 
-  echo "inputPath: " & expandFilename(inputPath)
-  echo "outFilePath: " & absolutePath(outDir)
-  echo "outFilename: " & outFile & outExt
-  echo "print?: " & $print
+  # Extract the headers from the inputPath file
+  var text = inputPath.readFile()
+  var headers = extractHeaders(text)
 
-  # TODO: Parse inputPath file as Markdown and extract the header structure.
-  # TODO: Open the outPath file and write the table of contents (with links)
-  #       plus the original contents.
+  var toc = generateTOC(headers)
 
-  let header = re"^ *(#{1,6}) *(.*?) *#* *$"
-  var m: RegexMatch
-  
-  # first a line-by-line method
-  for l in inputPath.lines:
-    if l.match(header, m):
-      let lev = m.group(0, l)[0]
-      let tex = m.group(1, l)[0] 
-      echo "found: " & tex & ", level: " & $(lev.len)
+  if not inject:
+    echo toc
+    return true
 
-  # TODO: next we need to create a heirarchy of headers.
-  #       probably one will be the "current one" and then when we hit one
-  #       of equal or greater value, we add it to the stack...
+  # Open the output file for injection of the TOC text
+  echo "WRITING NEW FILE"
+  try:
+    if top:
+      text.insert(toc, 0)
+    else:
+      text = text.replace("<<TOC>>", toc)
+
+    outPath.writeFile(text)
+
+    return true
+
+  except:
+    raise newException(IOError, "Could not write to output file.")
+
 
 
 when isMainModule:
-  cligen.dispatch(generateTOC, help = {"inputPath": "path to the Markdown " &
-                               "file to process",
-                               "outputPath": "path to the Markdown file to " &
-                               "output. Leave blank to replace the input.",
-                               "print": "just print the output to stdout."})
+  cligen.dispatch(
+    createTOC,
+    help = {"inputPath": "Path to the Markdown " &
+            "file to process",
+
+            "outputPath": "Path to the Markdown file to " &
+            "output. Leave blank to replace the input.",
+
+            "inject": "Inject to original file at <<TOC>> " &
+            "marker. Otherwise, will just print the TOC " &
+            "to stdout. If <<TOC>> marker does not exist " &
+            "in the file, the injection will be skipped.",
+
+            "top": "Inject the TOC at the beginning of " &
+            " the file instead of at the <<TOC>> marker. " &
+            "NOTE: This option will happily insert multiple TOCs " &
+            "into a file."}
+  )
 
