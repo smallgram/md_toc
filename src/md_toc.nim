@@ -40,7 +40,9 @@ proc createTOC(inputPath: string,
                  top: bool = false): bool =
   ## Create a TOC for an input markdown file. This is the program entry.
   var outPath: string = if outputPath == "": inputPath else: outputPath
-  var (outDir, outFile, outExt) = outPath.splitFile()
+  var (outDir, _, _) = outPath.splitFile()
+  if outDir == "":
+    outDir = "."
 
   if not fileExists(inputPath):
     raise newException(IOError, "That input file could not be found.") 
@@ -53,6 +55,7 @@ proc createTOC(inputPath: string,
   var text = inputPath.readFile()
   var headers = extractHeaders(text)
 
+  # Generate the TOC text from the header data
   var toc = generateTOC(headers)
 
   if not inject:
